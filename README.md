@@ -1,0 +1,3 @@
+An implementation of [this Spotify data viz](https://old.reddit.com/r/dataisbeautiful/comments/rfkh6r/for_fans_of_spotify_wrapped_you_can_download_your/) by [Kiernan Nicholls](https://github.com/kiernann) adapted for R Shiny.
+
+You can request your Spotofy data from [here](https://www.spotify.com/us/account/privacy/) and upload StreamingHistory0.json to get your own insights. [This](https://raw.githubusercontent.com/cosmoduende/r-spotify-history-analysis/main/StreamingHistory0.json) is publicly available data used for testing.
