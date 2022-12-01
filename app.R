@@ -21,12 +21,12 @@ ui <- fluidPage(
         "You can request your Spotofy data from ",
         tags$a(href = "https://www.spotify.com/us/account/privacy/", "here "),
         "and upload StreamingHistory0.json to get your own insights. ",
-        tags$a(href = "https://raw.githubusercontent.com/cosmoduende/r-spotify-history-analysis/main/StreamingHistory0.json", "This "),
-        "is publicly available data used for testing,"
+        tags$a(href = "https://raw.githubusercontent.com/cosmoduende/r-spotify-history-analysis/main/StreamingHistory0.json", "Here's "),
+        "a publicly available dataset used for testing,"
     ),
     helpText(
         "Check out the code for this project ",
-        tags$a(href = "https://github.com/johnathanfernandes", "here!")
+        tags$a(href = "https://github.com/johnathanfernandes/SpotifyRedditViz", "here!")
     ),
     
     mainPanel(
@@ -36,25 +36,39 @@ ui <- fluidPage(
             multiple = FALSE,
             accept = c(".json")
         ),
-        numericInput("Year", label = "Year:", value = 2022),
+        numericInput("Year", label = "Year:", value = 2020),
         
-        plotOutput(outputId = "monthBar"),
+        
         plotOutput("timePolar"),
-        plotOutput("cumulativeTime"),
         plotOutput("calendar"),
         plotOutput("MostListened"),
-        
+        plotOutput(outputId = "monthBar"),
+        plotOutput("cumulativeTime"),
     )
 )
 
+
+
 server <- function(input, output) {
+    download.file(
+        "https://raw.githubusercontent.com/cosmoduende/r-spotify-history-analysis/main/StreamingHistory0.json",
+        "history.json"
+    )
     
-    history <- reactive({
-        req(input$historyfile$datapath)
-        as_tibble(map_df(input$historyfile$datapath, fromJSON)) %>%
+    clean_data <- function(x) {
+        as_tibble(map_df(x, fromJSON)) %>%
             mutate(across(endTime, ymd_hm), minPlayed = msPlayed / 6e4) %>%
             filter(year(endTime) == input$Year ,
                    artistName != "Unknown Artist")
+    }
+    
+    history <- reactive({
+        if (is.null(input$historyfile)) {
+            clean_data("history.json")
+        }
+        else{
+            clean_data(input$historyfile$datapath)
+        }
     })
     
     output$monthBar <- renderPlot({
